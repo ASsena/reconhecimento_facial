@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Aluno</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        .container {
+            width: 50%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="file"], button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+        }
+        .success {
+            color: green;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cadastro de Aluno</h1>
+        <form action="/cadastrar" method="post" enctype="multipart/form-data">
+            <label for="nome">Nome:</label><br>
+            <input type="text" id="nome" name="nome" required><br><br>
+
+            <label for="dias">Dias permitidos (ex: mon,tue,wed):</label><br>
+            <input type="text" id="dias" name="dias" required><br><br>
+
+            <label for="imagem">Foto do aluno:</label><br>
+            <input type="file" id="imagem" name="imagem" accept="image/*" required><br><br>
+
+            <button type="submit">Cadastrar</button>
+        </form>
+
+        <!-- Mensagem de erro ou sucesso -->
+        <div id="feedback" class="error" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Exemplo de validação de dias permitidos
+        const form = document.querySelector('form');
+        form.addEventListener('submit', (e) => {
+            const dias = document.getElementById('dias').value;
+            const diasValidos = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+            const diasArray = dias.split(',').map(day => day.trim().toLowerCase());
+            const diasInvalidos = diasArray.filter(day => !diasValidos.includes(day));
+
+            if (diasInvalidos.length > 0) {
+                e.preventDefault();
+                const feedback = document.getElementById('feedback');
+                feedback.textContent = `Dias inválidos: ${diasInvalidos.join(', ')}`;
+                feedback.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

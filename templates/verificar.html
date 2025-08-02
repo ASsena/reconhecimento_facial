@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verificação Facial Automática</title>
+</head>
+<body>
+    <h1>Verificação Facial</h1>
+
+    <video id="camera" autoplay playsinline width="320" height="240"></video>
+    <p id="dimensoes">Dimensões: aguardando...</p>
+
+    <canvas id="canvas" width="480" height="640" style="display: none;"></canvas>
+    <p id="resultado"></p>
+
+    <script>
+    const video = document.getElementById("camera");
+    const canvas = document.getElementById("canvas");
+    const resultado = document.getElementById("resultado");
+    const contexto = canvas.getContext("2d");
+
+    // Mostra as dimensões da câmera assim que carregar
+    video.addEventListener("loadedmetadata", () => {
+        const largura = video.videoWidth;
+        const altura = video.videoHeight;
+        document.getElementById("dimensoes").innerText = `Dimensões da câmera: ${largura} x ${altura}`;
+    });
+
+    async function iniciarCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+        } catch (erro) {
+            resultado.innerText = "Erro ao acessar a câmera.";
+        }
+    }
+
+    async function capturarEVerificar() {
+        contexto.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imagemDataURL = canvas.toDataURL("image/jpeg");
+
+        try {
+            const resposta = await fetch("/verificar-rosto", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ imagem: imagemDataURL })
+            });
+
+            const dados = await resposta.json();
+            resultado.innerText = dados.mensagem;
+        } catch (e) {
+            resultado.innerText = "Erro na verificação.";
+        }
+
+        setTimeout(capturarEVerificar, 5000);
+    }
+
+    // Inicia a câmera e começa a verificação após alguns segundos
+    iniciarCamera().then(() => {
+        setTimeout(capturarEVerificar, 2000);
+    });
+    </script>
+
+</body>
+</html>
